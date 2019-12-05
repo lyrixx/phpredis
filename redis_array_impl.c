@@ -80,7 +80,7 @@ ra_load_hosts(RedisArray *ra, HashTable *hosts, zend_string *auth, long retry_in
         if (!b_lazy_connect)
         {
             /* connect */
-            if (redis_sock_server_open(redis->sock) < 0 || (auth && redis_sock_auth(redis->sock ) < 0)) {
+            if (redis_sock_server_open(redis->sock) != SUCCESS) {
                 zval_dtor(&z_cons);
                 ra->count = ++i;
                 return NULL;

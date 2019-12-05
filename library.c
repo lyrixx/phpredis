@@ -1888,7 +1888,7 @@ PHP_REDIS_API int redis_sock_connect(RedisSock *redis_sock)
                 zend_llist_remove_tail(&p->list);
 
                 if (redis_sock_check_liveness(redis_sock) == SUCCESS) {
-                    redis_sock->status = REDIS_SOCK_STATUS_CONNECTED;
+                    redis_sock->status = REDIS_SOCK_STATUS_READY;
                     return SUCCESS;
                 }
                 php_stream_pclose(redis_sock->stream);
@@ -1969,12 +1969,21 @@ PHP_REDIS_API int redis_sock_connect(RedisSock *redis_sock)
 PHP_REDIS_API int
 redis_sock_server_open(RedisSock *redis_sock)
 {
-    if (redis_sock) {
+    while (redis_sock) {
         switch (redis_sock->status) {
         case REDIS_SOCK_STATUS_FAILED:
             return FAILURE;
         case REDIS_SOCK_STATUS_DISCONNECTED:
-            return redis_sock_connect(redis_sock);
+            if (redis_sock_connect(redis_sock) == SUCCESS) {
+                continue;
+            }
+            return FAILURE;
+        case REDIS_SOCK_STATUS_CONNECTED:
+            if (!redis_sock->auth || redis_sock_auth(redis_sock) == SUCCESS) {
+                redis_sock->status = REDIS_SOCK_STATUS_READY;
+                return SUCCESS;
+            }
+            return FAILURE;
         default:
             return SUCCESS;
         }
