@@ -2826,7 +2826,7 @@ $redis->zAdd('k1', 3, 'val3');
 $redis->zAdd('k2', 2, 'val1');
 $redis->zAdd('k2', 3, 'val3');
 
-$redis->zinterstore('ko1', ['k1', 'k2']); 				/* 2, 'ko1' => ['val1', 'val3'] */
+$redis->zinterstore('ko1', ['k1', 'k2']); 		/* 2, 'ko1' => ['val1', 'val3'] */
 $redis->zinterstore('ko2', ['k1', 'k2'], [1, 1]); 	/* 2, 'ko2' => ['val1', 'val3'] */
 
 /* Weighted zinterstore */
